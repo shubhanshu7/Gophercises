@@ -7,68 +7,69 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-var taskBucket = []byte("tasks")
-var Db *bolt.DB
+var DbCon *bolt.DB
+var Tablename = []byte("todo")
 
 type Task struct {
-	Key   int
-	Value string
+	Id   int
+	Task string
 }
 
-func Init(dbPath string) error {
-	var err error
-	Db, err = bolt.Open(dbPath, 0600, &bolt.Options{Timeout: 1 * time.Second})
-	if err != nil {
-		return err
-	}
-	return Db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(taskBucket)
-		return err
-	})
+func itob(i int) []byte {
+	bt := make([]byte, 8)
+	binary.BigEndian.PutUint64(bt, uint64(i))
+
+	return bt
 }
+
+func btoi(b []byte) int {
+	return int(binary.BigEndian.Uint64(b))
+}
+
 func CreateTask(task string) (int, error) {
 	var id int
-	err := Db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket(taskBucket)
-		id64, _ := b.NextSequence()
-		id = int(id64)
+	err := DbCon.Update(func(t *bolt.Tx) error {
+		buc := t.Bucket(Tablename)
+		id64, _ := buc.NextSequence() //handle error
+		id := int(id64)
 		key := itob(id)
-		return b.Put(key, []byte(task))
+		return buc.Put(key, []byte(task))
 	})
-	if err != nil {
-		return -1, err
-	}
-	return id, nil
+
+	return id, err
 }
+
+func DeleteTask(id int) error {
+	return DbCon.Update(func(t *bolt.Tx) error {
+		buc := t.Bucket(Tablename)
+		return buc.Delete(itob(id))
+	})
+}
+
 func AllTasks() ([]Task, error) {
-	var tasks []Task
-	err := Db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(taskBucket)
-		c := b.Cursor()
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			tasks = append(tasks, Task{
-				Key:   btoi(k),
-				Value: string(v),
+	var todolist []Task
+	err := DbCon.View(func(t *bolt.Tx) error {
+		buc := t.Bucket(Tablename)
+		cur := buc.Cursor()
+		for key, val := cur.First(); key != nil; key, val = cur.Next() {
+			todolist = append(todolist, Task{
+				Id:   btoi(key),
+				Task: string(val),
 			})
 		}
 		return nil
 	})
+	return todolist, err
+}
+func Init(dbpath string) error {
+	var err error
+	DbCon, err = bolt.Open(dbpath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return tasks, nil
-}
-func DeleteTask(key int) error {
-	return Db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket(taskBucket)
-		return b.Delete(itob(key))
+	return DbCon.Update(func(t *bolt.Tx) error {
+		_, err := t.CreateBucketIfNotExists(Tablename)
+		return err
 	})
-}
-func itob(v int) []byte {
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, uint64(v))
-	return b
-}
-func btoi(b []byte) int {
-	return int(binary.BigEndian.Uint64(b))
+
 }

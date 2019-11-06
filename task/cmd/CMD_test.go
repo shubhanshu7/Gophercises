@@ -7,61 +7,69 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/shubhanshu7/Gophercises/task/db"
-	// "github.com/shubhanshu7/task/db"
 )
 
-var Temp = db.AllTasks
-var Temp2 = db.DeleteTask
+var Temp = MockShow
+var Temp2 = MockRemove
 
 func TestAdd(t *testing.T) {
 	hdir, _ := homedir.Dir()
 
 	path := filepath.Join(hdir, "tasks.db")
 	db.Init(path)
-	args := []string{"Add", "New", "value"}
+	args := []string{"one", "task"}
 	a := []string{}
 	addCmd.Run(addCmd, args)
-	db.Db.Close()
-	//store.Init("/")
+	db.DbCon.Close()
 	addCmd.Run(addCmd, a)
 }
-func TestList(t *testing.T) {
+func TestAllTask(t *testing.T) {
 	hdir, _ := homedir.Dir()
 
 	path := filepath.Join(hdir, "tasks.db")
 	db.Init(path)
-	arr := []string{"Hello", "hi"}
+	arr := []string{"Give", "tasks"}
 	listCmd.Run(listCmd, arr)
-	db.Db.Close()
-	db.Init("dummy")
+	db.DbCon.Close()
+	db.Init("sample")
 	listCmd.Run(listCmd, arr)
 
 }
-func TestDoneCmd(t *testing.T) {
+func TestDoCmd(t *testing.T) {
 	hdir, _ := homedir.Dir()
 
 	path := filepath.Join(hdir, "tasks.db")
 	db.Init(path)
-	valid_args := []string{"99", "2", "3"}
-	invalid_args := []string{"1", "h"}
+	valid_args := []string{"1", "100", "1989"}
+	invalid_args := []string{"10", "hii"}
 	docmd.Run(docmd, valid_args)
 	docmd.Run(docmd, invalid_args)
-	Temp2 = func(i int) error {
-		return errors.New("Done")
+	defer func() {
+		MockShow = Temp
+		MockRemove = Temp2
+	}()
+
+	MockRemove = func(i int) error {
+		return errors.New("My error")
 	}
 	docmd.Run(docmd, valid_args)
 
-	Temp = func() ([]db.Task, error) {
+	MockShow = func() ([]db.Task, error) {
 		return nil, errors.New("error")
 	}
 	docmd.Run(docmd, valid_args)
 }
 
-// func TestListNegative(t *testing.T) {
+func TestListFailed(t *testing.T) {
 
-// 	Temp = func() ([]db.Task, error) {
-// 		return nil, errors.New("error")
-// 	}
-// 	s := []string{}
-// 	listCmd.Run(listCmd, s)
-// }
+	defer func() {
+		MockShow = Temp
+
+	}()
+
+	MockShow = func() ([]db.Task, error) {
+		return nil, errors.New("error")
+	}
+	s := []string{}
+	listCmd.Run(listCmd, s)
+}

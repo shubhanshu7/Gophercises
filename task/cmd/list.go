@@ -3,13 +3,14 @@ package cmd
 import (
 	"fmt"
 
-	// "github.com/shubhanshu7/task/db"
 	"github.com/shubhanshu7/Gophercises/task/db"
 	"github.com/spf13/cobra"
 )
 
+var MockShow = db.AllTasks
+
 func CheckList(cmd *cobra.Command, args []string) {
-	tasks, err := db.AllTasks()
+	tasks, err := MockShow()
 	if err != nil {
 		fmt.Println("something is wrong", err.Error())
 	}
@@ -18,7 +19,7 @@ func CheckList(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println("you have following tasks")
 	for i, task := range tasks {
-		fmt.Printf("%d . %s\n", i+1, task.Value)
+		fmt.Printf("%d . %s\n", i+1, task.Task)
 	}
 }
 

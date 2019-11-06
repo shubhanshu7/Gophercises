@@ -14,9 +14,11 @@ type teststruct struct {
 	expected []byte
 }
 
+// test boti() and itob()
+
 var hdir, _ = homedir.Dir()
 
-var path = filepath.Join(hdir, "tasks.db")
+var path = filepath.Join(hdir, "todo.db")
 var testval = teststruct{
 	input:    5,
 	expected: []byte{0, 0, 0, 0, 0, 0, 0, 5},
@@ -67,3 +69,14 @@ func TestInit(t *testing.T) {
 		errors.New("error")
 	}
 }
+
+// func TestInitfunc(t *testing.T) {
+
+// 	home, _ := home.Dir()
+// 	dbPath := filepath.Join(home, "dummy.db")
+// 	err := Init(dbPath)
+// 	//err := Init(dbPath)
+// 	if err != nil {
+// 		t.Error("expected nit got", err)
+// 	}
+// }

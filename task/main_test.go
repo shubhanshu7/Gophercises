@@ -6,7 +6,7 @@ import (
 )
 
 func TestMain(t *testing.T) {
-	must(errors.New("dummy error"))
+	HandleError(errors.New("error"))
 	main()
 
 }

@@ -10,14 +10,18 @@ import (
 )
 
 func main() {
-	home, _ := homedir.Dir()
-	dbPath := filepath.Join(home, "tasks.db")
-	must(db.Init(dbPath))
-	must(cmd.RootCmd.Execute())
+	hdir, _ := homedir.Dir()
+
+	path := filepath.Join(hdir, "todo.db")
+
+	HandleError(db.Init(path))
+
+	HandleError(cmd.RootCmd.Execute())
 }
-func must(err error) {
+
+func HandleError(err error) {
 	if err != nil {
 		fmt.Println(err.Error())
-		return
+		return //os.Exit(1)
 	}
 }

@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var MockRemove = db.DeleteTask
+
 func Delete(cmd *cobra.Command, args []string) {
 	var ids []int
 	for _, arg := range args {
@@ -20,7 +22,7 @@ func Delete(cmd *cobra.Command, args []string) {
 			ids = append(ids, id)
 		}
 	}
-	tasks, err := db.AllTasks()
+	tasks, err := MockShow()
 	if err != nil {
 		fmt.Println("wrong", err)
 	}
@@ -30,7 +32,7 @@ func Delete(cmd *cobra.Command, args []string) {
 			continue
 		}
 		task := tasks[id-1]
-		err := db.DeleteTask(task.Key)
+		err := MockRemove(task.Id)
 		if err != nil {
 			fmt.Printf("failed to delete %d.Error %s", id, err)
 		} else {
