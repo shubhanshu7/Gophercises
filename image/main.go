@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/shubhanshu7/Gophercises/image/primitive"
 )
@@ -33,18 +32,23 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+var temp = tempfile
+
 //uploadHandler to upload image that is persisted throughout one request
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("image")
-	if err == nil {
-		defer file.Close()
-		ext := filepath.Ext(header.Filename)[1:]
-		saveFile, err := tempfile("", ext)
-		if err == nil {
-			io.Copy(saveFile, file)
-			http.Redirect(w, r, "modify/"+filepath.Base(saveFile.Name()), http.StatusFound)
-		}
+	if err != nil {
+		return
 	}
+	defer file.Close()
+	ext := filepath.Ext(header.Filename)[1:]
+	saveFile, err := temp("", ext)
+	if err != nil {
+		return
+	}
+
+	io.Copy(saveFile, file)
+	http.Redirect(w, r, "modify/"+filepath.Base(saveFile.Name()), http.StatusFound)
 	errorResponse(w, err)
 }
 
@@ -72,13 +76,13 @@ func modifyHandler(w http.ResponseWriter, r *http.Request) {
 func gegenerateSingleMode(w http.ResponseWriter, r *http.Request, file io.ReadSeeker, ext, mode string) {
 	var a, b, c string
 	var err error
-	a, err = genrateImage(file, ext, mode, "50")
+	a, err = genrateImage(file, ext, mode, "10")
 	if err == nil {
 		file.Seek(0, 0)
-		b, err = genrateImage(file, ext, mode, "100")
+		b, err = genrateImage(file, ext, mode, "20")
 		if err == nil {
 			file.Seek(0, 0)
-			c, err = genrateImage(file, ext, mode, "150")
+			c, err = genrateImage(file, ext, mode, "30")
 			if err == nil {
 				html := `<html><body>
 						{{range .}}
@@ -94,7 +98,7 @@ func gegenerateSingleMode(w http.ResponseWriter, r *http.Request, file io.ReadSe
 					Number int
 				}
 				images := []Images{
-					{a, 2, 50}, {b, 2, 100}, {c, 2, 150},
+					{a, 2, 10}, {b, 2, 20}, {c, 2, 30},
 				}
 
 				tpl.Execute(w, images)
@@ -197,11 +201,5 @@ func getHandlers() *http.ServeMux {
 var listenAndServerFunc = http.ListenAndServe
 
 func main() {
-	go func() {
-		t := time.NewTicker(5 * time.Minute)
-		for {
-			<-t.C
-		}
-	}()
 	log.Fatal(listenAndServerFunc(":3020", getHandlers()))
 }

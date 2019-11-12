@@ -13,6 +13,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// var a = io.Reader
+func TestUploadN(t *testing.T) {
+	var check = temp
+	defer func() {
+		temp = check
+	}()
+	w := httptest.NewRecorder()
+	r, err := http.NewRequest("", "", nil)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	uploadHandler(w, r)
+}
+
 func getRequestBody(t *testing.T) *bytes.Buffer {
 	file, err := os.Open("/home/gslab/Downloads/my.png")
 	if err != nil {
