@@ -9,8 +9,8 @@ import (
 	"github.com/shubhanshu7/Gophercises/task/db"
 )
 
-var Temp = MockShow
-var Temp2 = MockRemove
+var Temp = mockShow
+var Temp2 = mockRemove
 
 func TestAdd(t *testing.T) {
 	hdir, _ := homedir.Dir()
@@ -20,7 +20,7 @@ func TestAdd(t *testing.T) {
 	args := []string{"one", "task"}
 	a := []string{}
 	addCmd.Run(addCmd, args)
-	db.DbCon.Close()
+	db.Dbcon.Close()
 	addCmd.Run(addCmd, a)
 }
 func TestAllTask(t *testing.T) {
@@ -30,7 +30,7 @@ func TestAllTask(t *testing.T) {
 	db.Init(path)
 	arr := []string{"Give", "tasks"}
 	listCmd.Run(listCmd, arr)
-	db.DbCon.Close()
+	db.Dbcon.Close()
 	db.Init("sample")
 	listCmd.Run(listCmd, arr)
 
@@ -40,34 +40,34 @@ func TestDoCmd(t *testing.T) {
 
 	path := filepath.Join(hdir, "tasks.db")
 	db.Init(path)
-	valid_args := []string{"1", "100", "1989"}
-	invalid_args := []string{"10", "hii"}
-	docmd.Run(docmd, valid_args)
-	docmd.Run(docmd, invalid_args)
+	validargs := []string{"1", "100", "1989"}
+	invalidargs := []string{"10", "hii"}
+	docmd.Run(docmd, validargs)
+	docmd.Run(docmd, invalidargs)
 	defer func() {
-		MockShow = Temp
-		MockRemove = Temp2
+		mockShow = Temp
+		mockRemove = Temp2
 	}()
 
-	MockRemove = func(i int) error {
+	mockRemove = func(i int) error {
 		return errors.New("My error")
 	}
-	docmd.Run(docmd, valid_args)
+	docmd.Run(docmd, validargs)
 
-	MockShow = func() ([]db.Task, error) {
+	mockShow = func() ([]db.Task, error) {
 		return nil, errors.New("error")
 	}
-	docmd.Run(docmd, valid_args)
+	docmd.Run(docmd, validargs)
 }
 
 func TestListFailed(t *testing.T) {
 
 	defer func() {
-		MockShow = Temp
+		mockShow = Temp
 
 	}()
 
-	MockShow = func() ([]db.Task, error) {
+	mockShow = func() ([]db.Task, error) {
 		return nil, errors.New("error")
 	}
 	s := []string{}

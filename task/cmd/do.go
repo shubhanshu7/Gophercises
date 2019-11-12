@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"strconv"
 
-	// "github.com/shubhanshu7/task/db"
-
 	"github.com/shubhanshu7/Gophercises/task/db"
 	"github.com/spf13/cobra"
 )
 
-var MockRemove = db.DeleteTask
+var mockRemove = db.DeleteTask
 
+// Delete Will delete task
 func Delete(cmd *cobra.Command, args []string) {
 	var ids []int
 	for _, arg := range args {
@@ -22,7 +21,7 @@ func Delete(cmd *cobra.Command, args []string) {
 			ids = append(ids, id)
 		}
 	}
-	tasks, err := MockShow()
+	tasks, err := mockShow()
 	if err != nil {
 		fmt.Println("wrong", err)
 	}
@@ -32,7 +31,7 @@ func Delete(cmd *cobra.Command, args []string) {
 			continue
 		}
 		task := tasks[id-1]
-		err := MockRemove(task.Id)
+		err := mockRemove(task.ID)
 		if err != nil {
 			fmt.Printf("failed to delete %d.Error %s", id, err)
 		} else {

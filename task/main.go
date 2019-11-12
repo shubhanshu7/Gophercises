@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
@@ -19,9 +19,10 @@ func main() {
 	HandleError(cmd.RootCmd.Execute())
 }
 
+// HandleError will check for error
 func HandleError(err error) {
 	if err != nil {
-		fmt.Println(err.Error())
-		return //os.Exit(1)
+		log.Println(err.Error())
+		return
 	}
 }

@@ -7,10 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var MockShow = db.AllTasks
+var mockShow = db.AllTasks
 
+// CheckList will give list of all task
 func CheckList(cmd *cobra.Command, args []string) {
-	tasks, err := MockShow()
+	tasks, err := mockShow()
 	if err != nil {
 		fmt.Println("something is wrong", err.Error())
 	}

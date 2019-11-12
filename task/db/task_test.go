@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"testing"
@@ -13,8 +12,6 @@ type teststruct struct {
 	input    int
 	expected []byte
 }
-
-// test boti() and itob()
 
 var hdir, _ = homedir.Dir()
 
@@ -65,18 +62,7 @@ func TestGetAll(t *testing.T) {
 
 func TestInit(t *testing.T) {
 	err := Init("/")
-	if err != nil {
-		errors.New("error")
+	if err == nil {
+		t.Errorf(err.Error())
 	}
 }
-
-// func TestInitfunc(t *testing.T) {
-
-// 	home, _ := home.Dir()
-// 	dbPath := filepath.Join(home, "dummy.db")
-// 	err := Init(dbPath)
-// 	//err := Init(dbPath)
-// 	if err != nil {
-// 		t.Error("expected nit got", err)
-// 	}
-// }

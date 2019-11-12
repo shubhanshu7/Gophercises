@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// CheckAdd will add a task
 func CheckAdd(cmd *cobra.Command, args []string) {
 	task := strings.Join(args, " ")
 	_, err := db.CreateTask(task)
